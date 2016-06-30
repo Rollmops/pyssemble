@@ -7,7 +7,7 @@ from tempfile import TemporaryDirectory
 from pyssemble.common.copy_tree import copytree
 from pyssemble.python.python_setup_cfg_creator import PythonSetupCfgCreator
 from pyssemble.python.python_setup_py_creator import PythonSetupPyCreator
-from pyssemble.templater import Templater
+from pyssemble.resource_scanner import ResourceScanner
 
 LOGGER = logging.getLogger(__name__)
 
@@ -28,8 +28,8 @@ class PythonSDistCreator:
             if os.path.exists("README"):
                 shutil.copy("README", temp_dir)
 
-            templater = Templater(temp_dir, self.config)
-            templater.substitute()
+            templater = ResourceScanner(temp_dir, self.config)
+            templater.scan()
 
             self.python_setup_cfg_creator.create(temp_dir)
             self.python_setup_py_creator.create(temp_dir)
