@@ -2,6 +2,7 @@ import collections
 import json
 import logging
 import os
+import sys
 
 from pyssemble.dotted_template import DottedTemplate
 
@@ -40,6 +41,10 @@ class Config:
         return self.config.keys()
 
     def read(self):
+        if not os.path.exists(self.path):
+            LOGGER.error("Unable to find '%s'" % (self.path))
+            sys.exit(-1)
+
         with open(self.path) as config_file_pointer:
             self.config = Config._flatten(json.load(config_file_pointer))
 
