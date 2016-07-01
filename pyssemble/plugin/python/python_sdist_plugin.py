@@ -5,21 +5,21 @@ import subprocess
 from tempfile import TemporaryDirectory
 
 from pyssemble.common.copy_tree import copytree
-from pyssemble.python.python_setup_cfg_creator import PythonSetupCfgCreator
-from pyssemble.python.python_setup_py_creator import PythonSetupPyCreator
-from pyssemble.resource_scanner import ResourceScanner
+from pyssemble.plugin.python.python_setup_cfg_creator import PythonSetupCfgCreator
+from pyssemble.plugin.python.python_setup_py_creator import PythonSetupPyCreator
+from pyssemble.resource_injector import ResourceInjector
 
 LOGGER = logging.getLogger(__name__)
 
 
-class PythonSDistCreator:
+class PythonSDistPlugin:
     def __init__(self, config):
         self.config = config
 
         self.python_setup_py_creator = PythonSetupPyCreator(config)
         self.python_setup_cfg_creator = PythonSetupCfgCreator(config)
 
-    def create(self):
+    def run(self):
         with TemporaryDirectory() as temp_dir:
             source_lib_path = os.path.join(os.getcwd(), "src", "lib", "python")
             LOGGER.debug("Copying from %s to %s" % (source_lib_path, temp_dir))
@@ -28,8 +28,8 @@ class PythonSDistCreator:
             if os.path.exists("README"):
                 shutil.copy("README", temp_dir)
 
-            templater = ResourceScanner(temp_dir, self.config)
-            templater.scan()
+            templater = ResourceInjector(temp_dir, self.config)
+            templater.inject()
 
             self.python_setup_cfg_creator.create(temp_dir)
             self.python_setup_py_creator.create(temp_dir)

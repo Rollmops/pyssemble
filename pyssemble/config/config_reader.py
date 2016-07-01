@@ -11,13 +11,11 @@ LOGGER = logging.getLogger(__name__)
 
 class ConfigReader:
     DEFAULT_VALUES = {
-        "project.build_path": os.path.join(os.getcwd(), "build"),
         "project.author": os.environ.get("PROJECT_AUTHOR", "UNKNOWN"),
         "project.author_email": os.environ.get("PROJECT_AUTHOR_EMAIL", "UNKNOWN"),
         "project.url": os.environ.get("PROJECT_URL", "UNKNOWN"),
         "packaging.prefix": "/usr/local",
-        "packaging.prefix_main": "${packaging.prefix}/bin",
-        "packaging.prefix_lib": "${packaging.prefix}/lib",
+        "build_path": os.path.join(os.getcwd(), "build"),
     }
 
     def __init__(self, root_path):
@@ -32,6 +30,8 @@ class ConfigReader:
 
         self._set_default_for_missing(config)
         self._set_references(config)
+
+        config["root_path"] = self.root_path
 
         return config
 
@@ -52,9 +52,10 @@ class ConfigReader:
     @staticmethod
     def _set_references(config):
         for key, value in config.items():
-            value_template = DottedTemplate(str(value))
-            value = value_template.substitute(config)
-            config[key] = value
+            if isinstance(value, str):
+                value_template = DottedTemplate(value)
+                value = value_template.substitute(config)
+                config[key] = value
 
     @staticmethod
     def _set_default_for_missing(config):

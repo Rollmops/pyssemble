@@ -6,12 +6,12 @@ from pyssemble.dotted_template import DottedTemplate
 LOGGER = logging.getLogger(__name__)
 
 
-class ResourceScanner:
+class ResourceInjector:
     def __init__(self, path, config):
         self.path = path
         self.config = config
 
-    def scan(self):
+    def inject(self):
         for file in recursive_path_iterate(self.path, "*"):
             with open(file) as file_pointer:
                 content = file_pointer.read()
